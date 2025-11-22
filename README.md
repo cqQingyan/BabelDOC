@@ -404,7 +404,6 @@ This project uses a combination of [Semantic Versioning](https://semver.org/) an
 
 For an overview of the repository layout and suggested normalization steps for code, documentation, and folders, see [Project structure and normalization proposals](docs/architecture/project_structure.md).
 
-Sample PDFs, IL snippets, and preset configurations are cataloged in [Examples and sample configurations](docs/examples.md) to make quick smoke tests easier.
 
 ## How to Contribute
 
