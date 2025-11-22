@@ -1,4 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
+import pytest
+
+pytest.importorskip("peewee", reason="peewee is required for cache cleanup tests")
 
 from babeldoc.translator.cache import TranslationCache
 from babeldoc.translator.cache import _TranslationCache
