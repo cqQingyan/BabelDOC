@@ -132,10 +132,14 @@ not_in_nav: |
 # Page tree
 nav:
   - Home: index.md
+  - Guides:
+    - Cache management: cache.md
+    - Examples and sample configurations: examples.md
+    - Project structure and normalization proposals: architecture/project_structure.md
   - Supported Languages: supported_languages.md
   - API:
     - Async Translation API: ImplementationDetails/AsyncTranslate/AsyncTranslate.md
-  - Implementation Details:
+  - Architecture:
     - ImplementationDetails/README.md
     - PDF Parsing: ImplementationDetails/PDFParsing/PDFParsing.md
     - Layout Parser(.py): https://github.com/funstory-ai/BabelDOC/blob/main/babeldoc/document_il/midend/layout_parser.py
