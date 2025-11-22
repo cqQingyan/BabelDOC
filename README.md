@@ -127,6 +127,8 @@ uv run babeldoc --files example.pdf --files example2.pdf --openai --openai-model
 > 
 > If you find that an option is not listed below, it means that this option is a debugging option for maintainers. Please do not use these options.
 
+See [cache management](docs/cache.md) for details on where caches are stored and how to clean them up.
+
 
 ### Language Options
 
