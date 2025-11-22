@@ -83,6 +83,13 @@ git commit -m "<semantic commit message>"
 2. Development and Testing
 
 - Use the `uv run BabelDOC` command for development and testing.
+- Run quality checks locally before opening a PR:
+
+  ```bash
+  uv sync --group dev
+  uv run --group dev ruff check babeldoc tests
+  uv run --group dev --with pyright pyright babeldoc tests
+  ```
 
 - When you need print log, please use `log.debug()` to print info. **DO NOT USE `print()`**
 
