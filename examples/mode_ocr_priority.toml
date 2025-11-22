@@ -1,0 +1,13 @@
+[babeldoc]
+# 常用：OCR 优先模式，扫描件或文字缺失时使用。
+mode = "ocr-priority"
+lang-in = "en"
+lang-out = "zh"
+files = ["./sample.pdf"]
+openai = true
+openai-api-key = "YOUR_API_KEY"
+openai-model = "gpt-4o-mini"
+output = "./output"
+qps = 2
+# 建议保留 OCR 探测相关的默认值
+# auto-enable-ocr-workaround = true  # 由模式自动开启

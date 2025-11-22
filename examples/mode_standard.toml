@@ -1,0 +1,11 @@
+[babeldoc]
+# 常用：标准翻译模式，适用于绝大多数可直接提取文本的 PDF。
+mode = "standard"
+lang-in = "en"
+lang-out = "zh"
+files = ["./sample.pdf"]
+openai = true
+openai-api-key = "YOUR_API_KEY"
+openai-model = "gpt-4o-mini"
+output = "./output"
+qps = 4
