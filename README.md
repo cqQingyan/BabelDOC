@@ -400,6 +400,10 @@ This project uses a combination of [Semantic Versioning](https://semver.org/) an
 3. Does not support drop caps.
 4. Large pages will be skipped.
 
+## Project structure and conventions
+
+For an overview of the repository layout and suggested normalization steps for code, documentation, and folders, see [Project structure and normalization proposals](docs/architecture/project_structure.md).
+
 ## How to Contribute
 
 We encourage you to contribute to YADT! Please check out the [CONTRIBUTING](https://github.com/funstory-ai/yadt/blob/main/docs/CONTRIBUTING.md) guide.
