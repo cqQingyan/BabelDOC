@@ -29,6 +29,34 @@ logger = logging.getLogger(__name__)
 __version__ = "0.5.20"
 
 
+def _recommended_help(text: str) -> str:
+    return f"【推荐】{text}"
+
+
+def _advanced_help(text: str) -> str:
+    return f"【高级】{text}"
+
+
+def _debug_help(text: str) -> str:
+    return f"【调试】{text}"
+
+
+MODE_PRESETS: dict[str, dict[str, Any]] = {
+    "standard": {},
+    "compatibility": {
+        "enhance_compatibility": True,
+        "skip_clean": True,
+        "dual_translate_first": True,
+        "disable_rich_text_translate": True,
+    },
+    "ocr-priority": {
+        "ocr_workaround": True,
+        "skip_scanned_detection": True,
+        "auto_enable_ocr_workaround": True,
+    },
+}
+
+
 def create_parser():
     parser = configargparse.ArgParser(
         config_file_parser_class=configargparse.TomlConfigParser(["babeldoc"]),
@@ -47,70 +75,78 @@ def create_parser():
     parser.add_argument(
         "--files",
         action="append",
-        help="One or more paths to PDF files.",
+        help=_recommended_help("One or more paths to PDF files."),
+    )
+    parser.add_argument(
+        "--mode",
+        choices=list(MODE_PRESETS.keys()),
+        default="standard",
+        help=_recommended_help(
+            "Mode preset to bundle common toggles. Use 'standard' (default) for typical PDFs, 'compatibility' for troublesome files, or 'ocr-priority' for heavily scanned documents."
+        ),
     )
     parser.add_argument(
         "--debug",
         action="store_true",
-        help="Use debug logging level.",
+        help=_debug_help("Use debug logging level."),
     )
     parser.add_argument(
         "--warmup",
         action="store_true",
-        help="Only download and verify required assets then exit.",
+        help=_advanced_help("Only download and verify required assets then exit."),
     )
     parser.add_argument(
         "--rpc-doclayout",
-        help="RPC service host address for document layout analysis",
+        help=_advanced_help("RPC service host address for document layout analysis"),
     )
     parser.add_argument(
         "--rpc-doclayout2",
-        help="RPC service host address for document layout analysis",
+        help=_advanced_help("RPC service host address for document layout analysis"),
     )
     parser.add_argument(
         "--rpc-doclayout3",
-        help="RPC service host address for document layout analysis",
+        help=_advanced_help("RPC service host address for document layout analysis"),
     )
     parser.add_argument(
         "--rpc-doclayout4",
-        help="RPC service host address for document layout analysis",
+        help=_advanced_help("RPC service host address for document layout analysis"),
     )
     parser.add_argument(
         "--rpc-doclayout5",
-        help="RPC service host address for document layout analysis",
+        help=_advanced_help("RPC service host address for document layout analysis"),
     )
     parser.add_argument(
         "--rpc-doclayout6",
-        help="RPC service host address for document layout analysis",
+        help=_advanced_help("RPC service host address for document layout analysis"),
     )
     parser.add_argument(
         "--rpc-doclayout7",
-        help="RPC service host address for document layout analysis",
+        help=_advanced_help("RPC service host address for document layout analysis"),
     )
     parser.add_argument(
         "--generate-offline-assets",
         default=None,
-        help="Generate offline assets package in the specified directory",
+        help=_advanced_help("Generate offline assets package in the specified directory"),
     )
     parser.add_argument(
         "--restore-offline-assets",
         default=None,
-        help="Restore offline assets package from the specified file",
+        help=_advanced_help("Restore offline assets package from the specified file"),
     )
     parser.add_argument(
         "--working-dir",
         default=None,
-        help="Working directory for translation. If not set, use temp directory.",
+        help=_advanced_help("Working directory for translation. If not set, use temp directory."),
     )
     parser.add_argument(
         "--metadata-extra-data",
         default=None,
-        help="Extra data for metadata",
+        help=_advanced_help("Extra data for metadata"),
     )
     parser.add_argument(
         "--enable-process-pool",
         action="store_true",
-        help="DEBUG ONLY",
+        help=_debug_help("Use a process pool for translation stages (may change performance characteristics)."),
     )
     # translation option argument group
     translation_group = parser.add_argument_group(
@@ -120,270 +156,319 @@ def create_parser():
     translation_group.add_argument(
         "--pages",
         "-p",
-        help="Pages to translate. If not set, translate all pages. like: 1,2,1-,-3,3-5",
+        help=_recommended_help(
+            "Pages to translate. If not set, translate all pages. like: 1,2,1-,-3,3-5"
+        ),
     )
     translation_group.add_argument(
         "--min-text-length",
         type=int,
         default=5,
-        help="Minimum text length to translate (default: 5)",
+        help=_advanced_help("Minimum text length to translate (default: 5)"),
     )
     translation_group.add_argument(
         "--lang-in",
         "-li",
         default="en",
-        help="The code of source language.",
+        help=_recommended_help("The code of source language."),
     )
     translation_group.add_argument(
         "--lang-out",
         "-lo",
         default="zh",
-        help="The code of target language.",
+        help=_recommended_help("The code of target language."),
     )
     translation_group.add_argument(
         "--output",
         "-o",
-        help="Output directory for files. if not set, use same as input.",
+        help=_recommended_help(
+            "Output directory for files. if not set, use same as input."
+        ),
     )
     translation_group.add_argument(
         "--qps",
         "-q",
         type=int,
         default=4,
-        help="QPS limit of translation service",
+        help=_recommended_help("QPS limit of translation service"),
     )
     translation_group.add_argument(
         "--ignore-cache",
         action="store_true",
-        help="Ignore translation cache.",
+        help=_advanced_help("Ignore translation cache."),
     )
     translation_group.add_argument(
         "--no-dual",
         action="store_true",
-        help="Do not output bilingual PDF files",
+        help=_advanced_help("Do not output bilingual PDF files"),
     )
     translation_group.add_argument(
         "--no-mono",
         action="store_true",
-        help="Do not output monolingual PDF files",
+        help=_advanced_help("Do not output monolingual PDF files"),
     )
     translation_group.add_argument(
         "--formular-font-pattern",
-        help="Font pattern to identify formula text",
+        help=_advanced_help("Font pattern to identify formula text"),
     )
     translation_group.add_argument(
         "--formular-char-pattern",
-        help="Character pattern to identify formula text",
+        help=_advanced_help("Character pattern to identify formula text"),
     )
     translation_group.add_argument(
         "--split-short-lines",
         action="store_true",
-        help="Force split short lines into different paragraphs (may cause poor typesetting & bugs)",
+        help=_advanced_help(
+            "Force split short lines into different paragraphs (may cause poor typesetting & bugs)"
+        ),
     )
     translation_group.add_argument(
         "--short-line-split-factor",
         type=float,
         default=0.8,
-        help="Split threshold factor. The actual threshold is the median length of all lines on the current page * this factor",
+        help=_advanced_help(
+            "Split threshold factor. The actual threshold is the median length of all lines on the current page * this factor"
+        ),
     )
     translation_group.add_argument(
         "--skip-clean",
         action="store_true",
-        help="Skip PDF cleaning step",
+        help=_advanced_help("Skip PDF cleaning step"),
     )
     translation_group.add_argument(
         "--dual-translate-first",
         action="store_true",
-        help="Put translated pages first in dual PDF mode",
+        help=_advanced_help("Put translated pages first in dual PDF mode"),
     )
     translation_group.add_argument(
         "--disable-rich-text-translate",
         action="store_true",
-        help="Disable rich text translation (may help improve compatibility with some PDFs)",
+        help=_advanced_help(
+            "Disable rich text translation (may help improve compatibility with some PDFs)"
+        ),
     )
     translation_group.add_argument(
         "--enhance-compatibility",
         action="store_true",
-        help="Enable all compatibility enhancement options (equivalent to --skip-clean --dual-translate-first --disable-rich-text-translate)",
+        help=_advanced_help(
+            "Enable all compatibility enhancement options (equivalent to --skip-clean --dual-translate-first --disable-rich-text-translate)"
+        ),
     )
     translation_group.add_argument(
         "--use-alternating-pages-dual",
         action="store_true",
-        help="Use alternating pages mode for dual PDF. When enabled, original and translated pages are arranged in alternate order.",
+        help=_advanced_help(
+            "Use alternating pages mode for dual PDF. When enabled, original and translated pages are arranged in alternate order."
+        ),
     )
     translation_group.add_argument(
         "--watermark-output-mode",
         type=str,
         choices=["watermarked", "no_watermark", "both"],
         default="watermarked",
-        help="Control watermark output mode: 'watermarked' (default) adds watermark to translated PDF, 'no_watermark' doesn't add watermark, 'both' outputs both versions.",
+        help=_advanced_help(
+            "Control watermark output mode: 'watermarked' (default) adds watermark to translated PDF, 'no_watermark' doesn't add watermark, 'both' outputs both versions."
+        ),
     )
     translation_group.add_argument(
         "--max-pages-per-part",
         type=int,
-        help="Maximum number of pages per part for split translation. If not set, no splitting will be performed.",
+        help=_advanced_help(
+            "Maximum number of pages per part for split translation. If not set, no splitting will be performed."
+        ),
     )
     translation_group.add_argument(
         "--no-watermark",
         action="store_true",
-        help="[DEPRECATED] Use --watermark-output-mode=no_watermark instead. Do not add watermark to the translated PDF.",
+        help=_advanced_help(
+            "[DEPRECATED] Use --watermark-output-mode=no_watermark instead. Do not add watermark to the translated PDF."
+        ),
     )
     translation_group.add_argument(
         "--report-interval",
         type=float,
         default=0.1,
-        help="Progress report interval in seconds (default: 0.1)",
+        help=_debug_help("Progress report interval in seconds (default: 0.1)"),
     )
     translation_group.add_argument(
         "--translate-table-text",
         action="store_true",
         default=False,
-        help="Translate table text (experimental)",
+        help=_advanced_help("Translate table text (experimental)"),
     )
     translation_group.add_argument(
         "--show-char-box",
         action="store_true",
         default=False,
-        help="Show character box (debug only)",
+        help=_debug_help("Show character box (debug only)"),
     )
     translation_group.add_argument(
         "--skip-scanned-detection",
         action="store_true",
         default=False,
-        help="Skip scanned document detection (speeds up processing for non-scanned documents)",
+        help=_advanced_help(
+            "Skip scanned document detection (speeds up processing for non-scanned documents)"
+        ),
     )
     translation_group.add_argument(
         "--ocr-workaround",
         action="store_true",
         default=False,
-        help="Add text fill background (experimental)",
+        help=_recommended_help("Add text fill background (experimental)")
+        + " 优先用于扫描件，可与 --mode=ocr-priority 搭配",
     )
     translation_group.add_argument(
         "--custom-system-prompt",
-        help="Custom system prompt for translation.",
+        help=_advanced_help("Custom system prompt for translation."),
         default=None,
     )
     translation_group.add_argument(
         "--add-formula-placehold-hint",
         action="store_true",
         default=False,
-        help="Add formula placeholder hint for translation. (Currently not recommended, it may affect translation quality, default: False)",
+        help=_advanced_help(
+            "Add formula placeholder hint for translation. (Currently not recommended, it may affect translation quality, default: False)"
+        ),
     )
     translation_group.add_argument(
         "--glossary-files",
         type=str,
         default=None,
-        help="Comma-separated paths to glossary CSV files.",
+        help=_recommended_help("Comma-separated paths to glossary CSV files."),
     )
     translation_group.add_argument(
         "--pool-max-workers",
         type=int,
-        help="Maximum number of worker threads for internal task processing pools. If not specified, defaults to QPS value. This parameter directly sets the worker count, replacing previous QPS-based dynamic calculations.",
+        help=_advanced_help(
+            "Maximum number of worker threads for internal task processing pools. If not specified, defaults to QPS value. This parameter directly sets the worker count, replacing previous QPS-based dynamic calculations."
+        ),
     )
     translation_group.add_argument(
         "--term-pool-max-workers",
         type=int,
-        help="Maximum number of worker threads dedicated to automatic term extraction. If not specified, defaults to --pool-max-workers (or QPS value when unset).",
+        help=_advanced_help(
+            "Maximum number of worker threads dedicated to automatic term extraction. If not specified, defaults to --pool-max-workers (or QPS value when unset)."
+        ),
     )
     translation_group.add_argument(
         "--no-auto-extract-glossary",
         action="store_false",
         dest="auto_extract_glossary",
         default=True,
-        help="Disable automatic term extraction. (Config file: set auto_extract_glossary = false)",
+        help=_advanced_help(
+            "Disable automatic term extraction. (Config file: set auto_extract_glossary = false)"
+        ),
     )
     translation_group.add_argument(
         "--auto-enable-ocr-workaround",
         action="store_true",
         default=False,
-        help="Enable automatic OCR workaround. If a document is detected as heavily scanned, this will attempt to enable OCR processing and skip further scan detection. Note: This option interacts with `--ocr-workaround` and `--skip-scanned-detection`. See documentation for details. (default: False)",
+        help=_advanced_help(
+            "Enable automatic OCR workaround. If a document is detected as heavily scanned, this will attempt to enable OCR processing and skip further scan detection. Note: This option interacts with `--ocr-workaround` and `--skip-scanned-detection`. See documentation for details. (default: False)"
+        ),
     )
     translation_group.add_argument(
         "--primary-font-family",
         type=str,
         choices=["serif", "sans-serif", "script"],
         default=None,
-        help="Override primary font family for translated text. Choices: 'serif' for serif fonts, 'sans-serif' for sans-serif fonts, 'script' for script/italic fonts. If not specified, uses automatic font selection based on original text properties.",
+        help=_advanced_help(
+            "Override primary font family for translated text. Choices: 'serif' for serif fonts, 'sans-serif' for sans-serif fonts, 'script' for script/italic fonts. If not specified, uses automatic font selection based on original text properties."
+        ),
     )
     translation_group.add_argument(
         "--only-include-translated-page",
         action="store_true",
         default=False,
-        help="Only include translated pages in the output PDF. Effective only when --pages is used.",
+        help=_advanced_help(
+            "Only include translated pages in the output PDF. Effective only when --pages is used."
+        ),
     )
     translation_group.add_argument(
         "--save-auto-extracted-glossary",
         action="store_true",
         default=False,
-        help="Save automatically extracted glossary terms to a CSV file in the output directory.",
+        help=_advanced_help(
+            "Save automatically extracted glossary terms to a CSV file in the output directory."
+        ),
     )
     translation_group.add_argument(
         "--disable-graphic-element-process",
         action="store_true",
         default=False,
-        help="Disable graphic element process. (default: False)",
+        help=_advanced_help("Disable graphic element process. (default: False)"),
     )
     translation_group.add_argument(
         "--no-merge-alternating-line-numbers",
         action="store_false",
         dest="merge_alternating_line_numbers",
         default=True,
-        help="Disable post-processing that merges alternating line-number layouts (by default this feature is enabled).",
+        help=_advanced_help(
+            "Disable post-processing that merges alternating line-number layouts (by default this feature is enabled)."
+        ),
     )
     translation_group.add_argument(
         "--skip-translation",
         action="store_true",
         default=False,
-        help="Skip translation step. (default: False)",
+        help=_debug_help("Skip translation step. (default: False)"),
     )
     translation_group.add_argument(
         "--skip-form-render",
         action="store_true",
         default=False,
-        help="Skip form rendering. (default: False)",
+        help=_debug_help("Skip form rendering. (default: False)"),
     )
     translation_group.add_argument(
         "--skip-curve-render",
         action="store_true",
         default=False,
-        help="Skip curve rendering. (default: False)",
+        help=_debug_help("Skip curve rendering. (default: False)"),
     )
     translation_group.add_argument(
         "--only-parse-generate-pdf",
         action="store_true",
         default=False,
-        help="Only parse PDF and generate output PDF without translation (default: False). This skips all translation-related processing including layout analysis, paragraph finding, style processing, and translation itself.",
+        help=_debug_help(
+            "Only parse PDF and generate output PDF without translation (default: False). This skips all translation-related processing including layout analysis, paragraph finding, style processing, and translation itself."
+        ),
     )
     translation_group.add_argument(
         "--remove-non-formula-lines",
         action="store_true",
         default=False,
-        help="Remove non-formula lines from paragraph areas. This removes decorative lines that are not part of formulas, while protecting lines in figure/table areas. (default: False)",
+        help=_advanced_help(
+            "Remove non-formula lines from paragraph areas. This removes decorative lines that are not part of formulas, while protecting lines in figure/table areas. (default: False)"
+        ),
     )
     translation_group.add_argument(
         "--non-formula-line-iou-threshold",
         type=float,
         default=0.9,
-        help="IoU threshold for detecting paragraph overlap when removing non-formula lines. Higher values are more conservative. (default: 0.9)",
+        help=_advanced_help(
+            "IoU threshold for detecting paragraph overlap when removing non-formula lines. Higher values are more conservative. (default: 0.9)"
+        ),
     )
     translation_group.add_argument(
         "--figure-table-protection-threshold",
         type=float,
         default=0.9,
-        help="IoU threshold for protecting lines in figure/table areas when removing non-formula lines. Higher values provide more protection. (default: 0.9)",
+        help=_advanced_help(
+            "IoU threshold for protecting lines in figure/table areas when removing non-formula lines. Higher values provide more protection. (default: 0.9)"
+        ),
     )
     translation_group.add_argument(
         "--skip-formula-offset-calculation",
         action="store_true",
         default=False,
-        help="Skip formula offset calculation (default: False)",
+        help=_debug_help("Skip formula offset calculation (default: False)"),
     )
     # service option argument group
     service_group = translation_group.add_mutually_exclusive_group()
     service_group.add_argument(
         "--openai",
         action="store_true",
-        help="Use OpenAI translator.",
+        help=_recommended_help("Use OpenAI translator."),
     )
     service_group = parser.add_argument_group(
         "Translation - OpenAI Options",
@@ -392,72 +477,111 @@ def create_parser():
     service_group.add_argument(
         "--openai-model",
         default="gpt-4o-mini",
-        help="The OpenAI model to use for translation.",
+        help=_recommended_help("The OpenAI model to use for translation."),
     )
     service_group.add_argument(
         "--openai-base-url",
-        help="The base URL for the OpenAI API.",
+        help=_advanced_help("The base URL for the OpenAI API."),
     )
     service_group.add_argument(
         "--openai-api-key",
         "-k",
-        help="The API key for the OpenAI API.",
+        help=_recommended_help("The API key for the OpenAI API."),
     )
     service_group.add_argument(
         "--openai-term-extraction-model",
         default=None,
-        help="OpenAI model to use for automatic term extraction. Defaults to --openai-model when unset.",
+        help=_advanced_help(
+            "OpenAI model to use for automatic term extraction. Defaults to --openai-model when unset."
+        ),
     )
     service_group.add_argument(
         "--openai-term-extraction-base-url",
         default=None,
-        help="Base URL for the OpenAI API used during automatic term extraction. Falls back to --openai-base-url when unset.",
+        help=_advanced_help(
+            "Base URL for the OpenAI API used during automatic term extraction. Falls back to --openai-base-url when unset."
+        ),
     )
     service_group.add_argument(
         "--openai-term-extraction-api-key",
         default=None,
-        help="API key for the OpenAI API used during automatic term extraction. Falls back to --openai-api-key when unset.",
+        help=_advanced_help(
+            "API key for the OpenAI API used during automatic term extraction. Falls back to --openai-api-key when unset."
+        ),
     )
     service_group.add_argument(
         "--enable-json-mode-if-requested",
         action="store_true",
         default=False,
-        help="Enable JSON mode for OpenAI requests.",
+        help=_advanced_help("Enable JSON mode for OpenAI requests."),
     )
     service_group.add_argument(
         "--send-dashscope-header",
         action="store_true",
         default=False,
-        help="Send DashScope data inspection header to disable input/output inspection.",
+        help=_advanced_help(
+            "Send DashScope data inspection header to disable input/output inspection."
+        ),
     )
     service_group.add_argument(
         "--no-send-temperature",
         action="store_true",
         default=False,
-        help="Do not send temperature parameter to OpenAI API (default: send temperature).",
+        help=_advanced_help(
+            "Do not send temperature parameter to OpenAI API (default: send temperature)."
+        ),
     )
     service_group.add_argument(
         "--openai-reasoning",
         type=str,
         default=None,
-        help="Reasoning string to send in the OpenAI request body 'reasoning' field. If not set, the field is not sent.",
+        help=_advanced_help(
+            "Reasoning string to send in the OpenAI request body 'reasoning' field. If not set, the field is not sent."
+        ),
     )
     service_group.add_argument(
         "--openai-term-extraction-reasoning",
         type=str,
         default=None,
-        help="Reasoning string for the OpenAI term extraction translator. If not set, no reasoning field is sent for term extraction requests.",
+        help=_advanced_help(
+            "Reasoning string for the OpenAI term extraction translator. If not set, no reasoning field is sent for term extraction requests."
+        ),
     )
 
     return parser
+
+
+def _apply_mode_presets(args: Any, parser: configargparse.ArgParser) -> None:
+    preset = MODE_PRESETS.get(args.mode)
+    if not preset:
+        return
+
+    for option, value in preset.items():
+        if not hasattr(args, option):
+            continue
+        default_value = parser.get_default(option)
+        current_value = getattr(args, option)
+        if current_value == default_value:
+            setattr(args, option, value)
+            logger.debug(
+                "Mode %s sets %s to %s (was default %s)",
+                args.mode,
+                option,
+                value,
+                default_value,
+            )
 
 
 async def main():
     parser = create_parser()
     args: Any = parser.parse_args()
 
+    _apply_mode_presets(args, parser)
+
     if args.debug:
         logging.getLogger().setLevel(logging.DEBUG)
+
+    logger.info("Using mode preset: %s", args.mode)
 
     if args.generate_offline_assets:
         babeldoc.assets.assets.generate_offline_assets_package(
